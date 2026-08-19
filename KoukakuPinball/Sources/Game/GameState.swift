@@ -12,6 +12,7 @@ final class GameState: ObservableObject {
     @Published private(set) var ballsRemaining: Int = GameState.totalBalls
     @Published private(set) var isPlaying: Bool = false
     @Published private(set) var isGameOver: Bool = false
+    @Published private(set) var isPaused: Bool = false
 
     private let highScoreKey = "com.mfujita.koukakupinball.highScore"
 
@@ -24,6 +25,13 @@ final class GameState: ObservableObject {
         ballsRemaining = Self.totalBalls
         isPlaying = true
         isGameOver = false
+        isPaused = false
+    }
+
+    /// Only meaningful mid-game — tapping the screen before or after a game has no effect.
+    func togglePause() {
+        guard isPlaying else { return }
+        isPaused.toggle()
     }
 
     func addScore(_ points: Int) {

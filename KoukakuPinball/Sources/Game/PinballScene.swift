@@ -158,6 +158,13 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
         isRightActive = active
     }
 
+    /// Freezes (or resumes) the entire scene — physics, actions, and `update(_:)` all stop
+    /// while paused, so the flippers and ball simply hold in place with no extra guards needed
+    /// elsewhere.
+    func setPaused(_ paused: Bool) {
+        isPaused = paused
+    }
+
     // MARK: - Game lifecycle
 
     /// Resets the board for a fresh game and fires the first ball. Safe to call again
