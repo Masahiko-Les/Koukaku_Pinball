@@ -199,7 +199,7 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
         guard ball.position.x < laneX - size.width * 0.03 else { return }
 
         hasEnteredFieldThisLaunch = true
-        let body = SKPhysicsBody(edgeFrom: CGPoint(x: laneX, y: size.height * 0.78), to: CGPoint(x: laneX, y: size.height))
+        let body = SKPhysicsBody(edgeFrom: CGPoint(x: laneX, y: size.height * 0.86), to: CGPoint(x: laneX, y: size.height))
         body.categoryBitMask = PhysicsCategory.wall
         body.restitution = 0.3
         body.friction = 0.1
@@ -348,10 +348,11 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
         addChild(outline)
 
         // Internal wall separating the launch lane from the main field: a single straight line.
-        // It stops short of the launch guide (above) so a launched ball can cross over into the
-        // field, and stops at the same height as the left wall (below) where the return lanes take over.
+        // It stops short of the launch guide (above, matching its height) so a launched ball
+        // can cross over into the field, and stops at the same height as the left wall (below)
+        // where the return lanes take over.
         let laneX = w - laneWidth
-        addStaticEdge(from: CGPoint(x: laneX, y: h * 0.30), to: CGPoint(x: laneX, y: h * 0.78), restitution: 0.15, visible: true)
+        addStaticEdge(from: CGPoint(x: laneX, y: h * 0.30), to: CGPoint(x: laneX, y: h * 0.86), restitution: 0.15, visible: true)
     }
 
     /// The single most important piece of geometry on the table: a straight wall angled at
@@ -363,7 +364,11 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
     private func buildLaunchGuide() {
         let w = size.width
         let h = size.height
-        let baseY = h * 0.78
+        // Raised from 0.78 so the ball can travel further up the (outer) lane wall before
+        // it's forced to deflect — it was hitting this wall's near end well before ever
+        // reaching the top-right cycloid corner (radius 0.11w, so it starts around h*0.90).
+        // Kept a little below that so this guide doesn't overlap the corner's own geometry.
+        let baseY = h * 0.86
         let span = laneWidth * 1.9
         let angle: CGFloat = 48 * .pi / 180
 
@@ -503,13 +508,15 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
     /// exactly where the adjacent wall stops (the left board wall / the lane separator), so
     /// there's no gap for the ball to slip past.
     ///
-    /// The end points are kept well clear of the flippers themselves — 0.10w out from the
-    /// pivot horizontally, and above the pivot height vertically — rather than reaching in
-    /// close to them. A flipper's *dynamic* body sweeping through a *static* deflector that's
-    /// tucked in too tight causes constant low-level interpenetration, which the physics
-    /// engine "resolves" every frame by injecting energy — seen as the ball climbing walls or
-    /// bouncing on its own with no flipper input. Leaving a gap and letting gravity carry the
-    /// ball the last bit onto the flipper avoids that entirely.
+    /// The end points are kept clear of the flippers themselves — 0.05w out from the pivot
+    /// horizontally, 0.05h above the pivot height vertically — rather than reaching onto them
+    /// directly. A flipper's *dynamic* body sweeping through a *static* deflector that overlaps
+    /// it causes constant low-level interpenetration, which the physics engine "resolves" every
+    /// frame by injecting energy — seen as the ball climbing walls or bouncing on its own with
+    /// no flipper input. Even at full deflection the flipper's near corner only reaches about
+    /// 0.012w/0.019h past its pivot (it swings within a ~57° arc that stays on the flipper's own
+    /// side), so this margin stays a comfortable few times larger than that. Leaving a small gap
+    /// and letting gravity carry the ball the last bit onto the flipper avoids overlap entirely.
     private func buildReturnLanes() {
         let w = size.width
         let h = size.height
@@ -517,16 +524,17 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
         let leftFlipperPivotX = playfieldCenterX - offset
         let rightFlipperPivotX = playfieldCenterX + offset
         let laneX = w - laneWidth
+        let endY = size.height * flipperPivotYFraction + h * 0.05
 
         addStaticEdge(
             from: CGPoint(x: 0, y: h * 0.30),
-            to: CGPoint(x: leftFlipperPivotX - w * 0.10, y: h * 0.26),
+            to: CGPoint(x: leftFlipperPivotX - w * 0.05, y: endY),
             restitution: 0.3,
             visible: true
         )
         addStaticEdge(
             from: CGPoint(x: laneX, y: h * 0.30),
-            to: CGPoint(x: rightFlipperPivotX + w * 0.10, y: h * 0.26),
+            to: CGPoint(x: rightFlipperPivotX + w * 0.05, y: endY),
             restitution: 0.3,
             visible: true
         )
