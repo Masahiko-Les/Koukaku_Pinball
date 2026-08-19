@@ -13,12 +13,12 @@ struct PinballGameView: View {
     @StateObject private var gameState = GameState()
     @State private var scene: PinballScene?
 
-    /// Tracks how long a smile has been held continuously on the GAME OVER screen, so it can
-    /// trigger a restart hands-free after `restartHoldDuration` — separate from `gameState`
-    /// since it's pure UI/gesture bookkeeping, not session state.
-    @State private var restartHoldStartTime: Date?
-    @State private var restartHoldProgress: Double = 0
-    private let restartHoldDuration: TimeInterval = 1.0
+    /// Tracks how long a smile has been held continuously on the pre-game and GAME OVER
+    /// screens, so it can trigger a hands-free start/restart after `smileHoldDuration` —
+    /// separate from `gameState` since it's pure UI/gesture bookkeeping, not session state.
+    @State private var smileHoldStartTime: Date?
+    @State private var smileHoldProgress: Double = 0
+    private let smileHoldDuration: TimeInterval = 1.0
 
     var body: some View {
         GeometryReader { proxy in
@@ -70,31 +70,32 @@ struct PinballGameView: View {
             scene?.setPaused(isPaused)
         }
         .onChange(of: faceTrackingManager.smileState) { _ in
-            updateRestartHoldProgress()
+            updateSmileHoldProgress()
         }
     }
 
-    /// Accumulates continuous smile-hold time while the GAME OVER card is showing, and triggers
-    /// a hands-free restart once `restartHoldDuration` is reached — mirrors tapping "もう一度遊ぶ".
-    private func updateRestartHoldProgress() {
-        guard gameState.isGameOver else {
-            restartHoldStartTime = nil
-            restartHoldProgress = 0
+    /// Accumulates continuous smile-hold time whenever the pre-game or GAME OVER card is
+    /// showing (i.e. whenever a game isn't actively in progress), and triggers a hands-free
+    /// start/restart once `smileHoldDuration` is reached — mirrors tapping the card's button.
+    private func updateSmileHoldProgress() {
+        guard !gameState.isPlaying else {
+            smileHoldStartTime = nil
+            smileHoldProgress = 0
             return
         }
         let isSmiling = faceTrackingManager.smileState.isLeftSmileActive || faceTrackingManager.smileState.isRightSmileActive
         guard isSmiling else {
-            restartHoldStartTime = nil
-            restartHoldProgress = 0
+            smileHoldStartTime = nil
+            smileHoldProgress = 0
             return
         }
-        let startTime = restartHoldStartTime ?? Date()
-        restartHoldStartTime = startTime
+        let startTime = smileHoldStartTime ?? Date()
+        smileHoldStartTime = startTime
         let elapsed = Date().timeIntervalSince(startTime)
-        restartHoldProgress = min(elapsed / restartHoldDuration, 1.0)
-        if elapsed >= restartHoldDuration {
-            restartHoldStartTime = nil
-            restartHoldProgress = 0
+        smileHoldProgress = min(elapsed / smileHoldDuration, 1.0)
+        if elapsed >= smileHoldDuration {
+            smileHoldStartTime = nil
+            smileHoldProgress = 0
             startOrRestartGame()
         }
     }
@@ -119,7 +120,7 @@ struct PinballGameView: View {
             )
         case .ready:
             if gameState.isGameOver {
-                GameOverCard(gameState: gameState, holdProgress: restartHoldProgress, onRestart: startOrRestartGame)
+                GameOverCard(gameState: gameState, holdProgress: smileHoldProgress, onRestart: startOrRestartGame)
             } else if gameState.isPlaying {
                 VStack {
                     hud
@@ -127,7 +128,7 @@ struct PinballGameView: View {
                 }
             } else {
                 VStack {
-                    ReadyToStartCard(onStart: startOrRestartGame)
+                    ReadyToStartCard(holdProgress: smileHoldProgress, onStart: startOrRestartGame)
                     Spacer()
                 }
             }
@@ -230,6 +231,7 @@ private struct MessageCard: View {
 }
 
 private struct ReadyToStartCard: View {
+    let holdProgress: Double
     let onStart: () -> Void
 
     var body: some View {
@@ -248,6 +250,15 @@ private struct ReadyToStartCard: View {
                     .foregroundStyle(.black)
             }
             .padding(.horizontal, 24)
+
+            VStack(spacing: 6) {
+                ProgressView(value: holdProgress)
+                    .tint(.yellow)
+                    .frame(width: 140)
+                Text("笑顔を1秒キープでもスタートできます")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.7))
+            }
         }
         .padding(.vertical, 18)
         .padding(.horizontal, 16)
