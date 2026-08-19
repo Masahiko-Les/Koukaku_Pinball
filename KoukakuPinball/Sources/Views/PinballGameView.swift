@@ -9,6 +9,7 @@ import SwiftUI
 struct PinballGameView: View {
     @ObservedObject var faceTrackingManager: FaceTrackingManager
     @ObservedObject var settings: SettingsStore
+    @ObservedObject var scoreHistory: ScoreHistoryStore
     @StateObject private var gameState = GameState()
     @State private var scene: PinballScene?
 
@@ -43,6 +44,10 @@ struct PinballGameView: View {
         }
         .onChange(of: faceTrackingManager.smileState.isRightSmileActive) { isActive in
             scene?.setRightFlipperActive(isActive)
+        }
+        .onChange(of: gameState.isGameOver) { isGameOver in
+            guard isGameOver else { return }
+            scoreHistory.record(gameState.score)
         }
     }
 
@@ -237,5 +242,5 @@ private struct GameOverCard: View {
 }
 
 #Preview {
-    PinballGameView(faceTrackingManager: FaceTrackingManager(), settings: SettingsStore())
+    PinballGameView(faceTrackingManager: FaceTrackingManager(), settings: SettingsStore(), scoreHistory: ScoreHistoryStore())
 }

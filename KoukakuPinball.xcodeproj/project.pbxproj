@@ -13,6 +13,7 @@
 		56336258ADE3EBA8BA6512DF /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033D45DAB717890660F9751A /* CameraPreviewView.swift */; };
 		5B7B9DD8DA8F8836B5D76A3C /* FaceTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA9D757AC65D154A922382 /* FaceTrackingManager.swift */; };
 		62C4E7E0993E93C4C3260199 /* TrackingPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7295C87DA51CFD797A713F3 /* TrackingPhase.swift */; };
+		661F66BF375D3087198B0708 /* ScoreHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0086210003556EFA6B7F199 /* ScoreHistoryView.swift */; };
 		6C289DAF6E5200316BB9D5DB /* PinballGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68E34C56E2285714B637973A /* PinballGameView.swift */; };
 		76949046CA81D80FEAD63EE7 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEE283E9A5F4D218D6A6BB4 /* RootView.swift */; };
 		7714F19886D7ABCD0A91321F /* SmileIndicatorCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB7ECFF49DC1B6E3142692F /* SmileIndicatorCircle.swift */; };
@@ -22,6 +23,7 @@
 		C2B4A8B8C174D218EC9D317A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E717B3C69C543431D995D /* ContentView.swift */; };
 		D4D36B7A077870CFBBAB33BA /* GameSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F6F6CCA47A3968ACFC26A /* GameSound.swift */; };
 		E528AF8C37D336734061BE67 /* PinballScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65E2B660AFCC4D2A2EA4EEB /* PinballScene.swift */; };
+		EB795626BB7B151033B79E48 /* ScoreHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D268DDB89FD3372685BBFDE4 /* ScoreHistoryStore.swift */; };
 		F3ED4211D16A8194A6772075 /* GameConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CAA5D1D9FD47615DFB368C /* GameConfig.swift */; };
 		F53F7F5F1FBB89A041202255 /* GameState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4D6196DCA1217BD421A5497 /* GameState.swift */; };
 /* End PBXBuildFile section */
@@ -36,12 +38,14 @@
 		68E34C56E2285714B637973A /* PinballGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinballGameView.swift; sourceTree = "<group>"; };
 		79CAA5D1D9FD47615DFB368C /* GameConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConfig.swift; sourceTree = "<group>"; };
 		A4D6196DCA1217BD421A5497 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
+		B0086210003556EFA6B7F199 /* ScoreHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreHistoryView.swift; sourceTree = "<group>"; };
 		BBB7ECFF49DC1B6E3142692F /* SmileIndicatorCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmileIndicatorCircle.swift; sourceTree = "<group>"; };
 		BE1E717B3C69C543431D995D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C2453D7275396907412626ED /* KoukakuPinballApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoukakuPinballApp.swift; sourceTree = "<group>"; };
 		C297F3E0133234BA66C8916D /* SmileInputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmileInputState.swift; sourceTree = "<group>"; };
 		CE69BFF6ED8B8C5D88B743C2 /* PhysicsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsCategory.swift; sourceTree = "<group>"; };
 		D1C62157ABF647E403D112F2 /* KoukakuPinball.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = KoukakuPinball.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D268DDB89FD3372685BBFDE4 /* ScoreHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreHistoryStore.swift; sourceTree = "<group>"; };
 		D65E2B660AFCC4D2A2EA4EEB /* PinballScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinballScene.swift; sourceTree = "<group>"; };
 		DC2F6F6CCA47A3968ACFC26A /* GameSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSound.swift; sourceTree = "<group>"; };
 		F7295C87DA51CFD797A713F3 /* TrackingPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingPhase.swift; sourceTree = "<group>"; };
@@ -56,6 +60,7 @@
 				A4D6196DCA1217BD421A5497 /* GameState.swift */,
 				CE69BFF6ED8B8C5D88B743C2 /* PhysicsCategory.swift */,
 				D65E2B660AFCC4D2A2EA4EEB /* PinballScene.swift */,
+				D268DDB89FD3372685BBFDE4 /* ScoreHistoryStore.swift */,
 				1180B0D04AEB2102D9BAA912 /* SettingsStore.swift */,
 			);
 			path = Game;
@@ -88,6 +93,7 @@
 				BE1E717B3C69C543431D995D /* ContentView.swift */,
 				68E34C56E2285714B637973A /* PinballGameView.swift */,
 				2EEE283E9A5F4D218D6A6BB4 /* RootView.swift */,
+				B0086210003556EFA6B7F199 /* ScoreHistoryView.swift */,
 				332B466A5D49C997B65D0B92 /* SettingsView.swift */,
 				BBB7ECFF49DC1B6E3142692F /* SmileIndicatorCircle.swift */,
 			);
@@ -206,6 +212,8 @@
 				6C289DAF6E5200316BB9D5DB /* PinballGameView.swift in Sources */,
 				E528AF8C37D336734061BE67 /* PinballScene.swift in Sources */,
 				76949046CA81D80FEAD63EE7 /* RootView.swift in Sources */,
+				EB795626BB7B151033B79E48 /* ScoreHistoryStore.swift in Sources */,
+				661F66BF375D3087198B0708 /* ScoreHistoryView.swift in Sources */,
 				AF7195F3CBA3C6C255A48BF5 /* SettingsStore.swift in Sources */,
 				320710C9E0E6D0E2BADF3EF6 /* SettingsView.swift in Sources */,
 				8959B963A46F98D77B980442 /* SmileDetectionConstants.swift in Sources */,

@@ -5,6 +5,7 @@ import SwiftUI
 struct RootView: View {
     @StateObject private var faceTrackingManager = FaceTrackingManager()
     @StateObject private var settings = SettingsStore()
+    @StateObject private var scoreHistory = ScoreHistoryStore()
 
     var body: some View {
         Group {
@@ -13,8 +14,11 @@ struct RootView: View {
                     ContentView(faceTrackingManager: faceTrackingManager)
                         .tabItem { Label("口角チェック", systemImage: "face.smiling") }
 
-                    PinballGameView(faceTrackingManager: faceTrackingManager, settings: settings)
+                    PinballGameView(faceTrackingManager: faceTrackingManager, settings: settings, scoreHistory: scoreHistory)
                         .tabItem { Label("ピンボール", systemImage: "circle.grid.2x2") }
+
+                    ScoreHistoryView(scoreHistory: scoreHistory)
+                        .tabItem { Label("履歴", systemImage: "list.bullet.clipboard") }
 
                     SettingsView(settings: settings)
                         .tabItem { Label("設定", systemImage: "gearshape") }

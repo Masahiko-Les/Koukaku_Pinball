@@ -525,19 +525,22 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
         let rightFlipperPivotX = playfieldCenterX + offset
         let laneX = w - laneWidth
         let endY = size.height * flipperPivotYFraction + h * 0.05
+        // Extends each guide further along its own line, past the clearance-based end point
+        // computed above, at the user's request to reach closer to the flipper's base
+        // (originally +10%, then another +10% on top of that, for +20% total).
+        let lengthMultiplier: CGFloat = 1.20
 
-        addStaticEdge(
-            from: CGPoint(x: 0, y: h * 0.30),
-            to: CGPoint(x: leftFlipperPivotX - w * 0.05, y: endY),
-            restitution: 0.3,
-            visible: true
-        )
-        addStaticEdge(
-            from: CGPoint(x: laneX, y: h * 0.30),
-            to: CGPoint(x: rightFlipperPivotX + w * 0.05, y: endY),
-            restitution: 0.3,
-            visible: true
-        )
+        let leftStart = CGPoint(x: 0, y: h * 0.30)
+        let leftEnd = extended(from: leftStart, to: CGPoint(x: leftFlipperPivotX - w * 0.05, y: endY), by: lengthMultiplier)
+        addStaticEdge(from: leftStart, to: leftEnd, restitution: 0.3, visible: true)
+
+        let rightStart = CGPoint(x: laneX, y: h * 0.30)
+        let rightEnd = extended(from: rightStart, to: CGPoint(x: rightFlipperPivotX + w * 0.05, y: endY), by: lengthMultiplier)
+        addStaticEdge(from: rightStart, to: rightEnd, restitution: 0.3, visible: true)
+    }
+
+    private func extended(from start: CGPoint, to end: CGPoint, by multiplier: CGFloat) -> CGPoint {
+        CGPoint(x: start.x + (end.x - start.x) * multiplier, y: start.y + (end.y - start.y) * multiplier)
     }
 
     // MARK: - Setup: bumpers — six, scattered top-to-mid-field rather than tightly clustered
