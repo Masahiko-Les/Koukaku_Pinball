@@ -9,7 +9,11 @@ import AudioToolbox
 enum GameSound {
     private static let flipperSoundID: SystemSoundID = 1104
     private static let bumperSoundID: SystemSoundID = 1025
-    private static let ballLostSoundID: SystemSoundID = 1006
+    // 1006 (an SMS-receipt tone) ignores the ring/silent switch — that classification is
+    // baked into the system sound ID itself, not something AudioServicesPlaySystemSound can
+    // override. 1103 is a plain keyboard-click tone, same "always respects mute" family as
+    // flipperSoundID above.
+    private static let ballLostSoundID: SystemSoundID = 1103
 
     static func playFlipper(enabled: Bool) {
         guard enabled else { return }
