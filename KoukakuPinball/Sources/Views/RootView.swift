@@ -7,21 +7,31 @@ struct RootView: View {
     @StateObject private var settings = SettingsStore()
     @StateObject private var scoreHistory = ScoreHistoryStore()
 
+    @State private var selectedTab: AppTab = .faceCheck
+
     var body: some View {
         Group {
             if faceTrackingManager.isSupported {
-                TabView {
+                TabView(selection: $selectedTab) {
                     ContentView(faceTrackingManager: faceTrackingManager)
                         .tabItem { Label("口角チェック", systemImage: "face.smiling") }
+                        .tag(AppTab.faceCheck)
 
-                    PinballGameView(faceTrackingManager: faceTrackingManager, settings: settings, scoreHistory: scoreHistory)
+                    PinballGameView(
+                        faceTrackingManager: faceTrackingManager,
+                        settings: settings,
+                        scoreHistory: scoreHistory
+                    )
                         .tabItem { Label("ピンボール", systemImage: "circle.grid.2x2") }
+                        .tag(AppTab.pinball)
 
                     ScoreHistoryView(scoreHistory: scoreHistory)
                         .tabItem { Label("履歴", systemImage: "list.bullet.clipboard") }
+                        .tag(AppTab.history)
 
-                    SettingsView(settings: settings)
+                    SettingsView(settings: settings, faceTrackingManager: faceTrackingManager, selectedTab: $selectedTab)
                         .tabItem { Label("設定", systemImage: "gearshape") }
+                        .tag(AppTab.settings)
                 }
             } else {
                 unsupportedView

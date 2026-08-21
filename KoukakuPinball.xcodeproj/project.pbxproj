@@ -22,6 +22,7 @@
 		AF7195F3CBA3C6C255A48BF5 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1180B0D04AEB2102D9BAA912 /* SettingsStore.swift */; };
 		C2B4A8B8C174D218EC9D317A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E717B3C69C543431D995D /* ContentView.swift */; };
 		D4D36B7A077870CFBBAB33BA /* GameSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F6F6CCA47A3968ACFC26A /* GameSound.swift */; };
+		E1B607E42B536411D4517F18 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CB8CB40A0C51E20FB9AA56 /* AppTab.swift */; };
 		E528AF8C37D336734061BE67 /* PinballScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65E2B660AFCC4D2A2EA4EEB /* PinballScene.swift */; };
 		EB795626BB7B151033B79E48 /* ScoreHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D268DDB89FD3372685BBFDE4 /* ScoreHistoryStore.swift */; };
 		F3ED4211D16A8194A6772075 /* GameConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79CAA5D1D9FD47615DFB368C /* GameConfig.swift */; };
@@ -32,6 +33,7 @@
 		033D45DAB717890660F9751A /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		1180B0D04AEB2102D9BAA912 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		15FA9D757AC65D154A922382 /* FaceTrackingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceTrackingManager.swift; sourceTree = "<group>"; };
+		17CB8CB40A0C51E20FB9AA56 /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		2EEE283E9A5F4D218D6A6BB4 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		332B466A5D49C997B65D0B92 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5B0D503BF22C21EC61A4C896 /* SmileDetectionConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmileDetectionConstants.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 		CE63081FEB38BC791517A634 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				17CB8CB40A0C51E20FB9AA56 /* AppTab.swift */,
 				5B0D503BF22C21EC61A4C896 /* SmileDetectionConstants.swift */,
 				C297F3E0133234BA66C8916D /* SmileInputState.swift */,
 				F7295C87DA51CFD797A713F3 /* TrackingPhase.swift */,
@@ -201,6 +204,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1B607E42B536411D4517F18 /* AppTab.swift in Sources */,
 				56336258ADE3EBA8BA6512DF /* CameraPreviewView.swift in Sources */,
 				C2B4A8B8C174D218EC9D317A /* ContentView.swift in Sources */,
 				5B7B9DD8DA8F8836B5D76A3C /* FaceTrackingManager.swift in Sources */,

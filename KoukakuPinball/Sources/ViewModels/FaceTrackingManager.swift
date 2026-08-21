@@ -17,6 +17,10 @@ final class FaceTrackingManager: NSObject, ObservableObject {
     @Published private(set) var baselineRight: Float = 0
     @Published private(set) var calibrationProgress: Double = 0
     @Published private(set) var currentFPS: Double = 0
+    /// True right after `recalibrate()` until `.ready` is reached again — lets `ContentView`
+    /// distinguish "just re-registered" from an ordinary first-time calibration completion,
+    /// since only the former should show a "口角が再登録されました" confirmation.
+    @Published private(set) var didJustRecalibrate = false
 
     /// Exposed so an optional camera preview (`CameraPreviewView`) can attach to the same session.
     let session = ARSession()
@@ -36,9 +40,49 @@ final class FaceTrackingManager: NSObject, ObservableObject {
 
     private var lastFrameTimestamp: TimeInterval?
 
+    private enum PersistenceKeys {
+        static let baselineLeft = "com.mfujita.koukakupinball.baselineLeft"
+        static let baselineRight = "com.mfujita.koukakupinball.baselineRight"
+    }
+
     override init() {
         phase = ARFaceTrackingConfiguration.isSupported ? .waitingForFace : .unsupported
         super.init()
+        restoreSavedBaselineIfAvailable()
+    }
+
+    /// Skips straight to `.ready` using a baseline saved from a previous session's
+    /// calibration, so returning users aren't asked to recalibrate every launch.
+    private func restoreSavedBaselineIfAvailable() {
+        guard phase == .waitingForFace,
+              UserDefaults.standard.object(forKey: PersistenceKeys.baselineLeft) != nil else { return }
+        baselineLeft = UserDefaults.standard.float(forKey: PersistenceKeys.baselineLeft)
+        baselineRight = UserDefaults.standard.float(forKey: PersistenceKeys.baselineRight)
+        phase = .ready
+    }
+
+    /// Clears the saved baseline and restarts calibration from scratch — used by the
+    /// "口角を登録し直す" button in Settings if detection ever feels off.
+    ///
+    /// Goes straight to `.calibrating` when a face is already being tracked, rather than
+    /// `.waitingForFace`: that phase only advances on a *new* `didAdd` anchor event, which
+    /// never fires for a face that's already continuously tracked, so reset would otherwise
+    /// get stuck forever with no further progress.
+    func recalibrate() {
+        UserDefaults.standard.removeObject(forKey: PersistenceKeys.baselineLeft)
+        UserDefaults.standard.removeObject(forKey: PersistenceKeys.baselineRight)
+        baselineLeft = 0
+        baselineRight = 0
+        calibrationStartTimestamp = nil
+        calibrationProgress = 0
+        resetActivationStreaks()
+        didJustRecalibrate = true
+        phase = isFaceDetected ? .calibrating : .waitingForFace
+    }
+
+    /// Called once the "口角が再登録されました" confirmation has been shown.
+    func acknowledgeRecalibration() {
+        didJustRecalibrate = false
     }
 
     func start() {
@@ -102,9 +146,15 @@ final class FaceTrackingManager: NSObject, ObservableObject {
         if elapsed >= SmileDetectionConstants.calibrationDuration {
             baselineLeft = min(average(calibrationLeftSamples), SmileDetectionConstants.maxBaseline)
             baselineRight = min(average(calibrationRightSamples), SmileDetectionConstants.maxBaseline)
+            saveBaseline()
             resetActivationStreaks()
             phase = .ready
         }
+    }
+
+    private func saveBaseline() {
+        UserDefaults.standard.set(baselineLeft, forKey: PersistenceKeys.baselineLeft)
+        UserDefaults.standard.set(baselineRight, forKey: PersistenceKeys.baselineRight)
     }
 
     private func average(_ values: [Float]) -> Float {

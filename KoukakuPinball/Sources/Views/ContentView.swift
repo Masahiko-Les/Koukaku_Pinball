@@ -1,38 +1,53 @@
 import SwiftUI
 
-/// The face-tracking debug / calibration screen. Receives the shared `FaceTrackingManager`
+/// The face-tracking calibration screen. Receives the shared `FaceTrackingManager`
 /// from `RootView` rather than owning it, so state (calibration, session) survives tab switches.
 struct ContentView: View {
     @ObservedObject var faceTrackingManager: FaceTrackingManager
 
-    var body: some View {
-        VStack(spacing: 16) {
-            Text("口角コントローラー")
-                .font(.title2).bold()
-                .padding(.top, 12)
+    /// Sticks after the very first dismissal — the intro is a one-time explainer, not a
+    /// per-launch splash. `FaceTrackingManager` separately persists the calibration baseline
+    /// itself, so a returning user skips both this and calibration.
+    @AppStorage("com.mfujita.koukakupinball.hasSeenIntro") private var hasSeenIntro = false
 
-            statusSection
-                .frame(minHeight: 120)
+    var body: some View {
+        if hasSeenIntro {
+            trackingContent
+        } else {
+            IntroView { hasSeenIntro = true }
+        }
+    }
+
+    private var trackingContent: some View {
+        VStack(spacing: 20) {
+            header
+
+            statusCard
+                .frame(minHeight: 140)
 
             Spacer(minLength: 0)
 
-            HStack(spacing: 48) {
-                SmileIndicatorCircle(
-                    label: "LEFT",
-                    isActive: faceTrackingManager.smileState.isLeftSmileActive,
-                    activeColor: .green
-                )
-                SmileIndicatorCircle(
-                    label: "RIGHT",
-                    isActive: faceTrackingManager.smileState.isRightSmileActive,
-                    activeColor: .blue
-                )
+            if faceTrackingManager.phase == .ready {
+                HStack(spacing: 48) {
+                    SmileIndicatorCircle(
+                        label: "左口角",
+                        isActive: faceTrackingManager.smileState.isLeftSmileActive,
+                        activeColor: .green
+                    )
+                    SmileIndicatorCircle(
+                        label: "右口角",
+                        isActive: faceTrackingManager.smileState.isRightSmileActive,
+                        activeColor: .blue
+                    )
+                }
             }
 
             Spacer(minLength: 12)
 
-            debugSection
-                .padding(.bottom, 12)
+            if GameConfig.debugMode {
+                debugSection
+                    .padding(.bottom, 12)
+            }
         }
         .padding()
         .overlay(alignment: .topTrailing) {
@@ -44,8 +59,26 @@ struct ContentView: View {
         }
     }
 
+    private var header: some View {
+        VStack(spacing: 4) {
+            Text("口角コントローラー")
+                .font(.title2.bold())
+            Text("口角を上げるとフリッパーが動きます")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.top, 12)
+    }
+
+    private var statusCard: some View {
+        statusContent
+            .frame(maxWidth: .infinity)
+            .padding(24)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
+    }
+
     @ViewBuilder
-    private var statusSection: some View {
+    private var statusContent: some View {
         switch faceTrackingManager.phase {
         case .unsupported:
             EmptyView()
@@ -55,7 +88,11 @@ struct ContentView: View {
             calibratingView
         case .ready:
             if faceTrackingManager.isFaceDetected {
-                readyView
+                if faceTrackingManager.didJustRecalibrate {
+                    recalibratedView
+                } else {
+                    readyView
+                }
             } else {
                 faceGuidanceView
             }
@@ -69,9 +106,8 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
             Text("顔をカメラの正面に合わせてください")
                 .font(.headline)
+                .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity)
-        .padding()
     }
 
     private var calibratingView: some View {
@@ -80,16 +116,32 @@ struct ContentView: View {
                 .font(.headline)
                 .multilineTextAlignment(.center)
             ProgressView(value: faceTrackingManager.calibrationProgress)
-                .padding(.horizontal, 40)
+                .tint(.yellow)
+                .padding(.horizontal, 20)
         }
-        .frame(maxWidth: .infinity)
-        .padding()
+    }
+
+    /// Shown in place of `readyView` right after a recalibration completes, then
+    /// auto-dismisses back to the normal ready state a couple seconds later.
+    private var recalibratedView: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 40))
+                .foregroundStyle(.green)
+            Text("口角が再登録されました。")
+                .font(.headline)
+        }
+        .task {
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
+            faceTrackingManager.acknowledgeRecalibration()
+        }
     }
 
     private var readyView: some View {
         VStack(spacing: 12) {
-            Text("準備OK")
-                .font(.subheadline)
+            Label("準備OK", systemImage: "checkmark.circle.fill")
+                .font(.subheadline.bold())
                 .foregroundStyle(.green)
 
             HStack(spacing: 32) {
@@ -131,6 +183,51 @@ struct ContentView: View {
         .background(Color(.secondarySystemBackground))
         .cornerRadius(8)
         .padding(.horizontal)
+    }
+}
+
+// MARK: - First-launch intro
+
+private struct IntroView: View {
+    let onContinue: () -> Void
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            Image(systemName: "face.smiling")
+                .font(.system(size: 64))
+                .foregroundStyle(.yellow)
+
+            Text("スマイルピンボールへようこそ")
+                .font(.title2.bold())
+                .multilineTextAlignment(.center)
+
+            Text("このピンボールゲームは、あなたの口角でフリッパーを動かします。\n初回のみインカメで口角を登録します。")
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 32)
+
+            Text("顔の映像や情報は端末外に送信されません。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+
+            Spacer()
+
+            Button(action: onContinue) {
+                Text("はじめる")
+                    .font(.system(.headline, design: .rounded).bold())
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.yellow, in: Capsule())
+                    .foregroundStyle(.black)
+            }
+            .padding(.horizontal, 32)
+            .padding(.bottom, 24)
+        }
     }
 }
 
