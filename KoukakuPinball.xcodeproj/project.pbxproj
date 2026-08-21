@@ -16,7 +16,6 @@
 		661F66BF375D3087198B0708 /* ScoreHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0086210003556EFA6B7F199 /* ScoreHistoryView.swift */; };
 		6C289DAF6E5200316BB9D5DB /* PinballGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68E34C56E2285714B637973A /* PinballGameView.swift */; };
 		76949046CA81D80FEAD63EE7 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEE283E9A5F4D218D6A6BB4 /* RootView.swift */; };
-		7714F19886D7ABCD0A91321F /* SmileIndicatorCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB7ECFF49DC1B6E3142692F /* SmileIndicatorCircle.swift */; };
 		8959B963A46F98D77B980442 /* SmileDetectionConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0D503BF22C21EC61A4C896 /* SmileDetectionConstants.swift */; };
 		8BE621D5EDA4168340805B7D /* PhysicsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE69BFF6ED8B8C5D88B743C2 /* PhysicsCategory.swift */; };
 		AF7195F3CBA3C6C255A48BF5 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1180B0D04AEB2102D9BAA912 /* SettingsStore.swift */; };
@@ -41,7 +40,6 @@
 		79CAA5D1D9FD47615DFB368C /* GameConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConfig.swift; sourceTree = "<group>"; };
 		A4D6196DCA1217BD421A5497 /* GameState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameState.swift; sourceTree = "<group>"; };
 		B0086210003556EFA6B7F199 /* ScoreHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreHistoryView.swift; sourceTree = "<group>"; };
-		BBB7ECFF49DC1B6E3142692F /* SmileIndicatorCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmileIndicatorCircle.swift; sourceTree = "<group>"; };
 		BE1E717B3C69C543431D995D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C2453D7275396907412626ED /* KoukakuPinballApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoukakuPinballApp.swift; sourceTree = "<group>"; };
 		C297F3E0133234BA66C8916D /* SmileInputState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmileInputState.swift; sourceTree = "<group>"; };
@@ -97,7 +95,6 @@
 				2EEE283E9A5F4D218D6A6BB4 /* RootView.swift */,
 				B0086210003556EFA6B7F199 /* ScoreHistoryView.swift */,
 				332B466A5D49C997B65D0B92 /* SettingsView.swift */,
-				BBB7ECFF49DC1B6E3142692F /* SmileIndicatorCircle.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -221,7 +218,6 @@
 				AF7195F3CBA3C6C255A48BF5 /* SettingsStore.swift in Sources */,
 				320710C9E0E6D0E2BADF3EF6 /* SettingsView.swift in Sources */,
 				8959B963A46F98D77B980442 /* SmileDetectionConstants.swift in Sources */,
-				7714F19886D7ABCD0A91321F /* SmileIndicatorCircle.swift in Sources */,
 				03DA64ED663E603FF6C98C41 /* SmileInputState.swift in Sources */,
 				62C4E7E0993E93C4C3260199 /* TrackingPhase.swift in Sources */,
 			);

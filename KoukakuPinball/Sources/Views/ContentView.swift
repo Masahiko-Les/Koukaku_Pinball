@@ -22,27 +22,12 @@ struct ContentView: View {
         VStack(spacing: 20) {
             header
 
+            cameraPreview
+
             statusCard
                 .frame(minHeight: 140)
 
-            Spacer(minLength: 0)
-
-            if faceTrackingManager.phase == .ready {
-                HStack(spacing: 48) {
-                    SmileIndicatorCircle(
-                        label: "左口角",
-                        isActive: faceTrackingManager.smileState.isLeftSmileActive,
-                        activeColor: .green
-                    )
-                    SmileIndicatorCircle(
-                        label: "右口角",
-                        isActive: faceTrackingManager.smileState.isRightSmileActive,
-                        activeColor: .blue
-                    )
-                }
-            }
-
-            Spacer(minLength: 12)
+            Spacer()
 
             if GameConfig.debugMode {
                 debugSection
@@ -50,24 +35,20 @@ struct ContentView: View {
             }
         }
         .padding()
-        .overlay(alignment: .topTrailing) {
-            CameraPreviewView(session: faceTrackingManager.session)
-                .frame(width: 90, height: 130)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(.secondary.opacity(0.3)))
-                .padding([.top, .trailing], 12)
-        }
     }
 
     private var header: some View {
-        VStack(spacing: 4) {
-            Text("口角コントローラー")
-                .font(.title2.bold())
-            Text("口角を上げるとフリッパーが動きます")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .padding(.top, 12)
+        Text("口角チェック")
+            .font(.title2.bold())
+            .padding(.top, 12)
+    }
+
+    private var cameraPreview: some View {
+        CameraPreviewView(session: faceTrackingManager.session)
+            .aspectRatio(3.0 / 4.0, contentMode: .fit)
+            .frame(maxWidth: 176)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(.secondary.opacity(0.3)))
     }
 
     private var statusCard: some View {
@@ -144,10 +125,34 @@ struct ContentView: View {
                 .font(.subheadline.bold())
                 .foregroundStyle(.green)
 
+            Text("笑うとフリッパーが動きます。")
+                .font(.subheadline.bold())
+                .foregroundStyle(.green)
+
             HStack(spacing: 32) {
                 smileValueView(title: "左口角", value: faceTrackingManager.smileState.mouthSmileLeft)
                 smileValueView(title: "右口角", value: faceTrackingManager.smileState.mouthSmileRight)
             }
+
+            // Matches the real board's flipper spacing: pivots ~0.44w apart, paddles
+            // ~0.21w long each, leaving the paddles' resting tips only a few percent of
+            // the screen width apart — proportionally much tighter than a plain centered gap.
+            //
+            // The extra height here isn't padding — a capsule pivoting from its edge sweeps
+            // a much taller arc than its own 18pt thickness (roughly ±45pt at these angles),
+            // and without reserving that as real layout height, the swing visually overlaps
+            // whatever sits above this row instead of rotating in its own clear space.
+            HStack(spacing: 24) {
+                FlipperIndicator(
+                    isActive: faceTrackingManager.smileState.isLeftSmileActive,
+                    mirrored: false
+                )
+                FlipperIndicator(
+                    isActive: faceTrackingManager.smileState.isRightSmileActive,
+                    mirrored: true
+                )
+            }
+            .frame(height: 90)
         }
     }
 
@@ -183,6 +188,39 @@ struct ContentView: View {
         .background(Color(.secondarySystemBackground))
         .cornerRadius(8)
         .padding(.horizontal)
+    }
+}
+
+// MARK: - Left/right smile indicators
+
+/// A red flipper-paddle shape matching the actual in-game flipper as closely as this
+/// smaller UI context allows: same color (`PinballScene.flipperColor`), same rest/swing
+/// angle magnitudes (`flipperRestDegrees` / `flipperUpDegrees`), and — critically — it
+/// pivots from one *end*, not its center, exactly like `makeFlipperNode`'s paddle does
+/// around `pinFlipper`'s anchor. A center-rotated capsule reads as generic; an
+/// edge-pivoted one reads as an actual flipper.
+private struct FlipperIndicator: View {
+    let isActive: Bool
+    /// The right flipper is the left flipper's mirror image: pivot on the opposite edge,
+    /// paddle swinging the opposite way.
+    let mirrored: Bool
+
+    private let restDegrees: Double = 25
+    private let swingDegrees: Double = 57
+
+    private var angle: Double {
+        let sign: Double = mirrored ? -1 : 1
+        let rest = sign * restDegrees
+        guard isActive else { return rest }
+        return rest - sign * swingDegrees
+    }
+
+    var body: some View {
+        Capsule()
+            .fill(Color(red: 0.87, green: 0.27, blue: 0.24))
+            .frame(width: 84, height: 18)
+            .rotationEffect(.degrees(angle), anchor: mirrored ? .trailing : .leading)
+            .animation(.easeOut(duration: 0.06), value: isActive)
     }
 }
 
