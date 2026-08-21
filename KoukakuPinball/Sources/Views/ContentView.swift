@@ -29,6 +29,10 @@ struct ContentView: View {
 
             Spacer()
 
+            if faceTrackingManager.phase == .ready {
+                recalibrateButton
+            }
+
             if GameConfig.debugMode {
                 debugSection
                     .padding(.bottom, 12)
@@ -45,10 +49,29 @@ struct ContentView: View {
 
     private var cameraPreview: some View {
         CameraPreviewView(session: faceTrackingManager.session)
-            .aspectRatio(3.0 / 4.0, contentMode: .fit)
-            .frame(maxWidth: 176)
+            // Explicit width AND height, rather than .aspectRatio(_:contentMode:) deriving
+            // height from a proposed size — ARSCNView doesn't report a usable intrinsic
+            // size, and letting SwiftUI infer its height from an unconstrained proposal is
+            // what was making this taller than intended and overlapping statusCard below it.
+            .frame(width: 120, height: 160)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(.secondary.opacity(0.3)))
+    }
+
+    /// Redoes calibration from scratch without leaving this tab — a quicker path to the
+    /// same effect as Settings' "口角を登録し直す", for when detection feels off right now.
+    private var recalibrateButton: some View {
+        Button {
+            faceTrackingManager.recalibrate()
+        } label: {
+            Text("口角を再調整する")
+                .font(.system(.subheadline, design: .rounded).bold())
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(Color.yellow, in: Capsule())
+                .foregroundStyle(.black)
+        }
+        .padding(.horizontal, 24)
     }
 
     private var statusCard: some View {
