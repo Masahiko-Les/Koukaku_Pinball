@@ -105,6 +105,8 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
     private var hasEnteredFieldThisLaunch = false
     private var laneGateNode: SKNode?
 
+    private static let relaunchActionKey = "relaunchAfterLoss"
+
     private let gameState: GameState
     private let settings: SettingsStore
 
@@ -172,6 +174,25 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
     func startGame() {
         isHandlingBallLoss = false
         launchBall()
+    }
+
+    /// Stops the current ball wherever it is and parks it back at the launch pad, without
+    /// firing a new one. Used when a game is abandoned mid-play (the pause screen's "ゲームを
+    /// 終了する") so the table matches the "ゲームスタート" pre-game screen it's shown
+    /// alongside, instead of continuing to run in the background.
+    func resetToIdle() {
+        removeAction(forKey: Self.relaunchActionKey)
+        isBallLaunched = false
+        isHandlingBallLoss = false
+        hasEnteredFieldThisLaunch = false
+        offScreenFrameCount = 0
+        laneGateNode?.removeFromParent()
+        laneGateNode = nil
+
+        ball.physicsBody?.velocity = .zero
+        ball.physicsBody?.angularVelocity = 0
+        ball.physicsBody?.isDynamic = false
+        ball.position = launchPosition
     }
 
     private var launchPosition: CGPoint {
@@ -308,7 +329,7 @@ final class PinballScene: SKScene, SKPhysicsContactDelegate {
                     self?.isHandlingBallLoss = false
                     self?.launchBall()
                 }
-            ]))
+            ]), withKey: Self.relaunchActionKey)
         }
     }
 

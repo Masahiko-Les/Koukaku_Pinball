@@ -55,6 +55,13 @@ struct PinballGameView: View {
                 newScene.scaleMode = .resizeFill
                 scene = newScene
             }
+            .onDisappear {
+                // Fires when switching to another tab too, not just leaving the app — TabView
+                // keeps this view's state alive in the background, so without this a game left
+                // running would keep playing (and scoring) unseen behind 履歴/設定/etc.
+                guard gameState.isPlaying, !gameState.isPaused else { return }
+                gameState.togglePause()
+            }
         }
         .onChange(of: faceTrackingManager.smileState.isLeftSmileActive) { isActive in
             scene?.setLeftFlipperActive(isActive)
@@ -136,13 +143,25 @@ struct PinballGameView: View {
     }
 
     private var pausedOverlay: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 20) {
             Text("PAUSED")
                 .font(.system(size: 32, weight: .heavy, design: .rounded))
                 .foregroundStyle(.white)
             Text("画面をタップして再開")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.7))
+
+            Button(role: .destructive) {
+                gameState.abandonGame()
+                scene?.resetToIdle()
+            } label: {
+                Text("ゲームを終了する")
+                    .font(.system(.subheadline, design: .rounded).bold())
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(.white.opacity(0.15), in: Capsule())
+                    .foregroundStyle(.white)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.black.opacity(0.6))
@@ -323,5 +342,9 @@ private struct GameOverCard: View {
 }
 
 #Preview {
-    PinballGameView(faceTrackingManager: FaceTrackingManager(), settings: SettingsStore(), scoreHistory: ScoreHistoryStore())
+    PinballGameView(
+        faceTrackingManager: FaceTrackingManager(),
+        settings: SettingsStore(),
+        scoreHistory: ScoreHistoryStore()
+    )
 }

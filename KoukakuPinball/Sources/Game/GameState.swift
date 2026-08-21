@@ -34,6 +34,18 @@ final class GameState: ObservableObject {
         isPaused.toggle()
     }
 
+    /// Quits the current game without recording a score-history entry — used by "ゲームを
+    /// 終了する" on the pause screen. Unlike losing all three balls, this returns straight to
+    /// the pre-game "ゲームスタート" state rather than showing GAME OVER.
+    func abandonGame() {
+        guard isPlaying else { return }
+        score = 0
+        ballsRemaining = Self.totalBalls
+        isPlaying = false
+        isGameOver = false
+        isPaused = false
+    }
+
     func addScore(_ points: Int) {
         guard isPlaying else { return }
         score += points
